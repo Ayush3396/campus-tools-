@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load marketplace_tags %}
+{% block title %}My Listings{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <div class="page-header">
+        <div class="d-flex align-center" style="justify-content: space-between;">
+            <div>
+                <h1>My Listings</h1>
+                <p>All items you have listed for lending or exchange.</p>
+            </div>
+            <a href="{% url 'marketplace:add_item' %}" class="btn btn-primary">+ Add New Item</a>
+        </div>
+    </div>
+
+    {% if items %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Condition</th>
+                    <th>Availability</th>
+                    <th>Listed On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <a href="{% url 'marketplace:item_detail' item.pk %}" style="font-weight:500;">
+                            {{ item.name }}
+                        </a>
+                    </td>
+                    <td class="text-muted text-sm">{{ item.category.name|default:"—" }}</td>
+                    <td><span class="badge badge-{{ item.listing_type }}">{{ item.get_listing_type_display }}</span></td>
+                    <td><span class="badge {{ item.condition|badge_class }}">{{ item.get_condition_display }}</span></td>
+                    <td><span class="badge {{ item.availability|badge_class }}">{{ item.get_availability_display }}</span></td>
+                    <td class="text-muted text-sm">{{ item.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'marketplace:item_detail' item.pk %}" class="btn btn-secondary btn-sm">View</a>
+                            <a href="{% url 'marketplace:edit_item' item.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+                            <form method="post" action="{% url 'marketplace:delete_item' item.pk %}"
+                                  onsubmit="return confirm('Delete \'{{ item.name }}\'? This cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="empty-state" style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+        <div class="empty-state-icon">&#9634;</div>
+        <h3>No listings yet</h3>
+        <p>You haven't listed any items. Add something you're willing to lend or exchange.</p>
+        <a href="{% url 'marketplace:add_item' %}" class="btn btn-primary">List Your First Item</a>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

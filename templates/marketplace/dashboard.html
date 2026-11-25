@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Welcome back, <strong>{{ user.first_name|default:user.username }}</strong>. Here's what's happening.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-value">{{ total_listings }}</div>
+            <div class="stat-card-label">My Listings</div>
+            <a href="{% url 'marketplace:my_listings' %}" class="stat-card-link">View all &rarr;</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-value">{{ total_pending_received }}</div>
+            <div class="stat-card-label">Requests Received</div>
+            <a href="{% url 'marketplace:lending_requests_received' %}" class="stat-card-link">View &rarr;</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-value">{{ total_pending_sent }}</div>
+            <div class="stat-card-label">Requests Sent</div>
+            <a href="{% url 'marketplace:lending_requests_sent' %}" class="stat-card-link">View &rarr;</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-value">{{ active_lending }}</div>
+            <div class="stat-card-label">Active Lendings</div>
+            <a href="{% url 'marketplace:lending_requests_received' %}" class="stat-card-link">View &rarr;</a>
+        </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="d-flex gap-3 mb-6">
+        <a href="{% url 'marketplace:add_item' %}" class="btn btn-primary">+ List New Item</a>
+        <a href="{% url 'marketplace:browse' %}" class="btn btn-secondary">Browse Items</a>
+        <a href="{% url 'marketplace:lending_requests_received' %}" class="btn btn-secondary">Lending Requests</a>
+        <a href="{% url 'marketplace:exchange_requests_received' %}" class="btn btn-secondary">Exchange Requests</a>
+    </div>
+
+    <div class="two-col">
+
+        <!-- Recent Lending Requests Received -->
+        <div class="card">
+            <div class="card-header">Recent Lending Requests</div>
+            <div class="card-body" style="padding: 0;">
+                {% if recent_lending %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>From</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in recent_lending %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'marketplace:item_detail' req.item.pk %}">
+                                    {{ req.item.name|truncatechars:28 }}
+                                </a>
+                            </td>
+                            <td>{{ req.requester.first_name|default:req.requester.username }}</td>
+                            <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state" style="padding: 32px;">
+                    <p>No lending requests yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Exchange Requests Received -->
+        <div class="card">
+            <div class="card-header">Recent Exchange Proposals</div>
+            <div class="card-body" style="padding: 0;">
+                {% if recent_exchange %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>From</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in recent_exchange %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'marketplace:item_detail' req.requested_item.pk %}">
+                                    {{ req.requested_item.name|truncatechars:28 }}
+                                </a>
+                            </td>
+                            <td>{{ req.requester.first_name|default:req.requester.username }}</td>
+                            <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state" style="padding: 32px;">
+                    <p>No exchange proposals yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</div>
+{% endblock %}

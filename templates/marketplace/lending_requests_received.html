@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Lending Requests Received{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <div class="page-header">
+        <h1>Lending Requests Received</h1>
+        <p>Borrowing requests sent to you for your items. Approve or reject them here.</p>
+    </div>
+
+    <!-- Tab-like nav for switching between received/sent -->
+    <div class="d-flex gap-2 mb-6">
+        <a href="{% url 'marketplace:lending_requests_received' %}" class="btn btn-primary btn-sm">Received</a>
+        <a href="{% url 'marketplace:lending_requests_sent' %}" class="btn btn-secondary btn-sm">Sent by Me</a>
+        <a href="{% url 'marketplace:exchange_requests_received' %}" class="btn btn-secondary btn-sm">Exchange Received</a>
+        <a href="{% url 'marketplace:exchange_requests_sent' %}" class="btn btn-secondary btn-sm">Exchange Sent</a>
+    </div>
+
+    {% if requests_list %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Requested by</th>
+                    <th>Duration</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests_list %}
+                <tr>
+                    <td>
+                        <a href="{% url 'marketplace:item_detail' req.item.pk %}" style="font-weight:500;">
+                            {{ req.item.name }}
+                        </a>
+                    </td>
+                    <td>{{ req.requester.first_name|default:req.requester.username }} {{ req.requester.last_name }}</td>
+                    <td class="text-sm">{{ req.duration }}</td>
+                    <td class="text-sm text-muted" style="max-width: 200px;">
+                        {{ req.message|truncatechars:70 }}
+                    </td>
+                    <td class="text-sm text-muted">{{ req.created_at|date:"d M Y" }}</td>
+                    <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            {% if req.status == 'pending' %}
+                            <form method="post" action="{% url 'marketplace:approve_lending_request' req.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form method="post" action="{% url 'marketplace:reject_lending_request' req.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                            {% elif req.status == 'approved' %}
+                            <form method="post" action="{% url 'marketplace:complete_lending_request' req.pk %}"
+                                  onsubmit="return confirm('Mark this as returned and completed?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm">Mark Returned</button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted text-sm">—</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="empty-state" style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+        <div class="empty-state-icon">&#9634;</div>
+        <h3>No requests yet</h3>
+        <p>When other students request your items, they will appear here.</p>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Exchange Proposals Received{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <div class="page-header">
+        <h1>Exchange Proposals Received</h1>
+        <p>Students proposing to exchange something for your item. Review what they're offering.</p>
+    </div>
+
+    <div class="d-flex gap-2 mb-6">
+        <a href="{% url 'marketplace:lending_requests_received' %}" class="btn btn-secondary btn-sm">Lending Received</a>
+        <a href="{% url 'marketplace:lending_requests_sent' %}" class="btn btn-secondary btn-sm">Lending Sent</a>
+        <a href="{% url 'marketplace:exchange_requests_received' %}" class="btn btn-primary btn-sm">Exchange Received</a>
+        <a href="{% url 'marketplace:exchange_requests_sent' %}" class="btn btn-secondary btn-sm">Exchange Sent</a>
+    </div>
+
+    {% if requests_list %}
+
+    {% for req in requests_list %}
+    <div class="card mb-4">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>
+                <strong>{{ req.requester.first_name|default:req.requester.username }}</strong>
+                wants your <a href="{% url 'marketplace:item_detail' req.requested_item.pk %}">{{ req.requested_item.name }}</a>
+            </span>
+            <span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span>
+        </div>
+        <div class="card-body">
+            <div class="two-col" style="gap: 24px;">
+                <div>
+                    <p class="text-sm font-semi" style="color: var(--text-muted); margin-bottom: 6px;">THEY ARE OFFERING</p>
+                    <p style="font-weight: 600; margin-bottom: 4px;">{{ req.offered_item_name }}</p>
+                    <p class="text-sm text-muted">{{ req.offered_item_description }}</p>
+                </div>
+                <div>
+                    {% if req.message %}
+                    <p class="text-sm font-semi" style="color: var(--text-muted); margin-bottom: 6px;">MESSAGE</p>
+                    <p class="text-sm text-muted">{{ req.message }}</p>
+                    {% endif %}
+                    <p class="text-sm text-muted mt-4">Received: {{ req.created_at|date:"d M Y" }}</p>
+                </div>
+            </div>
+
+            {% if req.status == 'pending' %}
+            <div class="d-flex gap-2 mt-4" style="padding-top: 16px; border-top: 1px solid var(--border);">
+                <form method="post" action="{% url 'marketplace:accept_exchange_request' req.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm">Accept Proposal</button>
+                </form>
+                <form method="post" action="{% url 'marketplace:reject_exchange_request' req.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                </form>
+            </div>
+            {% elif req.status == 'accepted' %}
+            <div class="d-flex gap-2 mt-4" style="padding-top: 16px; border-top: 1px solid var(--border);">
+                <div class="alert alert-success" style="margin: 0; flex: 1;">
+                    Accepted. Arrange the exchange with {{ req.requester.first_name|default:req.requester.username }}.
+                </div>
+                <form method="post" action="{% url 'marketplace:complete_exchange_request' req.pk %}"
+                      onsubmit="return confirm('Confirm that the exchange is complete?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">Mark Complete</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty-state" style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+        <div class="empty-state-icon">&#9634;</div>
+        <h3>No exchange proposals yet</h3>
+        <p>When students propose exchanges for your items, they'll appear here.</p>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load marketplace_tags %}
+{% block title %}Profile — {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            {{ profile_user.first_name|first|upper }}{{ profile_user.last_name|first|upper }}
+        </div>
+        <div>
+            <div class="profile-name">
+                {{ profile_user.first_name }} {{ profile_user.last_name }}
+            </div>
+            <div class="profile-username">@{{ profile_user.username }}</div>
+            <div class="text-sm text-muted mt-4">
+                Member since {{ profile_user.date_joined|date:"F Y" }}
+                &nbsp;&bull;&nbsp;
+                {{ items.count }} item{{ items.count|pluralize }} listed
+            </div>
+        </div>
+        <div style="margin-left: auto;">
+            <a href="{% url 'marketplace:dashboard' %}" class="btn btn-secondary btn-sm">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="two-col">
+
+        <!-- My Items -->
+        <div>
+            <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 14px;">My Listed Items</h2>
+            {% if items %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for item in items %}
+                <div class="card" style="border-radius: var(--radius);">
+                    <div class="card-body" style="padding: 14px 16px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <a href="{% url 'marketplace:item_detail' item.pk %}" style="font-weight:500;">
+                                {{ item.name }}
+                            </a>
+                            <div style="margin-top: 4px; display: flex; gap: 5px;">
+                                <span class="badge badge-{{ item.listing_type }}">{{ item.get_listing_type_display }}</span>
+                                <span class="badge {{ item.availability|badge_class }}">{{ item.get_availability_display }}</span>
+                            </div>
+                        </div>
+                        <span class="text-sm text-muted">{{ item.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state" style="border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--white); padding: 32px;">
+                <p>No items listed yet.</p>
+                <a href="{% url 'marketplace:add_item' %}" class="btn btn-primary btn-sm mt-4">Add Item</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Activity -->
+        <div>
+            <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 14px;">Borrowing Activity</h2>
+            {% if borrowing_history %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in borrowing_history %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'marketplace:item_detail' req.item.pk %}">
+                                    {{ req.item.name|truncatechars:28 }}
+                                </a>
+                            </td>
+                            <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                            <td class="text-sm text-muted">{{ req.created_at|date:"d M" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card" style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+                No borrowing activity yet.
+            </div>
+            {% endif %}
+
+            <h2 style="font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 14px;">Lending Activity</h2>
+            {% if lending_history %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Borrower</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in lending_history %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'marketplace:item_detail' req.item.pk %}">
+                                    {{ req.item.name|truncatechars:22 }}
+                                </a>
+                            </td>
+                            <td>{{ req.requester.first_name|default:req.requester.username }}</td>
+                            <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card" style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+                No lending activity yet.
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load marketplace_tags %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-inner">
+        <h1>Borrow what you need.<br>Share what you have.</h1>
+        <p>
+            Campus Exchange connects college students to share, lend,
+            and exchange items within the campus community — saving money
+            and reducing waste.
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'marketplace:browse' %}" class="btn btn-primary">Browse Items</a>
+            {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline">Join Campus Exchange</a>
+            {% else %}
+            <a href="{% url 'marketplace:add_item' %}" class="btn btn-outline">List an Item</a>
+            {% endif %}
+        </div>
+
+        <div class="hero-stats">
+            <div>
+                <div class="hero-stat-value">{{ total_available }}</div>
+                <div class="hero-stat-label">Items Available</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">{{ categories.count }}</div>
+                <div class="hero-stat-label">Categories</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">{{ total_lenders }}</div>
+                <div class="hero-stat-label">Student Lenders</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title" style="text-align:center; margin-bottom: 32px;">How it works</h2>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>List your item</h3>
+                <p>Add an item you're willing to lend or exchange — take a photo, pick a category, and you're done.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Send a request</h3>
+                <p>Find something you need, read the listing, and send a borrowing or exchange request to the owner.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Collect and return</h3>
+                <p>Once approved, collect the item from your fellow student. Return it on time and everyone benefits.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="section" style="background: var(--white); border-bottom: 1px solid var(--border);">
+    <div class="container">
+        <h2 class="section-title">Browse by Category</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{% url 'marketplace:browse' %}?category={{ category.id }}" class="category-chip">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Items -->
+<section class="section">
+    <div class="container">
+        <div class="d-flex align-center" style="justify-content: space-between; margin-bottom: 20px;">
+            <h2 class="section-title" style="margin-bottom: 0;">Recently Listed</h2>
+            <a href="{% url 'marketplace:browse' %}" class="text-sm" style="color: var(--green);">View all &rarr;</a>
+        </div>
+
+        {% if featured_items %}
+        <div class="item-grid">
+            {% for item in featured_items %}
+            <div class="item-card">
+                {% if item.image %}
+                <div class="item-card-image">
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                </div>
+                {% else %}
+                <div class="item-no-image">
+                    <div class="item-no-image-icon">&#9711;</div>
+                    <span>No photo</span>
+                </div>
+                {% endif %}
+
+                <div class="item-card-body">
+                    <div class="item-card-name">
+                        <a href="{% url 'marketplace:item_detail' item.pk %}">{{ item.name }}</a>
+                    </div>
+
+                    <div class="item-card-meta">
+                        <span class="badge badge-{{ item.listing_type }}">{{ item.get_listing_type_display }}</span>
+                        <span class="badge {{ item.condition|badge_class }}">{{ item.get_condition_display }}</span>
+                    </div>
+
+                    {% if item.category %}
+                    <div class="text-sm text-muted">{{ item.category.name }}</div>
+                    {% endif %}
+
+                    <div class="item-card-owner">
+                        Listed by {{ item.owner.first_name|default:item.owner.username }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty-state" style="border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--white);">
+            <div class="empty-state-icon">&#9634;</div>
+            <h3>No items listed yet</h3>
+            <p>Be the first to list an item and help your fellow students.</p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'marketplace:add_item' %}" class="btn btn-primary">Add Your First Item</a>
+            {% else %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary">Get Started</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

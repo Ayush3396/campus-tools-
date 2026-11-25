@@ -1,0 +1,51 @@
+<nav class="navbar">
+    <div class="navbar-inner">
+
+        <a href="{% url 'marketplace:home' %}" class="nav-logo">
+            <span class="nav-logo-dot"></span>
+            Campus Exchange
+        </a>
+
+        <div class="nav-links">
+            <a href="{% url 'marketplace:browse' %}"
+               class="{% if request.resolver_match.url_name == 'browse' %}active{% endif %}">
+                Browse Items
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'marketplace:dashboard' %}"
+               class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                Dashboard
+            </a>
+            <a href="{% url 'marketplace:my_listings' %}"
+               class="{% if request.resolver_match.url_name == 'my_listings' %}active{% endif %}">
+                My Listings
+            </a>
+            <a href="{% url 'marketplace:lending_requests_received' %}"
+               class="{% if 'requests' in request.resolver_match.url_name %}active{% endif %}">
+                Requests
+            </a>
+            {% endif %}
+            <a href="{% url 'marketplace:about' %}"
+               class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                About
+            </a>
+        </div>
+
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <span class="nav-username">
+                    Hello, <strong>{{ user.first_name|default:user.username }}</strong>
+                </span>
+                <a href="{% url 'marketplace:add_item' %}" class="btn btn-primary btn-sm">+ Add Item</a>
+                <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline btn-sm">Login</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Register</a>
+            {% endif %}
+        </div>
+
+    </div>
+</nav>

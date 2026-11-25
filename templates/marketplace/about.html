@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container" style="max-width: 780px;">
+
+    <div class="page-header">
+        <h1>About Campus Exchange</h1>
+        <p>A CA2 project built with Django, Python, and SQLite.</p>
+    </div>
+
+    <div class="card mb-6">
+        <div class="card-header">Problem Statement</div>
+        <div class="card-body">
+            <p style="line-height:1.75; color: var(--text-mid);">
+                College students regularly need items — scientific calculators, reference books, lab equipment,
+                chargers, sports gear, and stationery — for a limited period of time. Purchasing these items
+                solely for temporary use is expensive. At the same time, students who already own these items
+                often leave them unused for extended periods.
+            </p>
+            <p style="line-height:1.75; color: var(--text-mid); margin-top: 12px;">
+                There is no centralized, trusted platform where students can list items they're willing to lend
+                or exchange, discover what's available on campus, and manage the entire lifecycle of a sharing
+                transaction. Campus Exchange solves this.
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-6">
+        <div class="card-header">Objectives</div>
+        <div class="card-body">
+            <ul style="display: flex; flex-direction: column; gap: 10px; list-style: none; padding: 0;">
+                <li style="display:flex; gap:12px; align-items:flex-start;">
+                    <span style="color: var(--green); font-weight:700; min-width:20px;">1.</span>
+                    <span style="color: var(--text-mid);">Provide a single, trusted platform for students to list, discover, borrow, and exchange items on campus.</span>
+                </li>
+                <li style="display:flex; gap:12px; align-items:flex-start;">
+                    <span style="color: var(--green); font-weight:700; min-width:20px;">2.</span>
+                    <span style="color: var(--text-mid);">Reduce unnecessary student expenditure by enabling borrowing instead of buying.</span>
+                </li>
+                <li style="display:flex; gap:12px; align-items:flex-start;">
+                    <span style="color: var(--green); font-weight:700; min-width:20px;">3.</span>
+                    <span style="color: var(--text-mid);">Put idle items to productive use through a structured lending and exchange system.</span>
+                </li>
+                <li style="display:flex; gap:12px; align-items:flex-start;">
+                    <span style="color: var(--green); font-weight:700; min-width:20px;">4.</span>
+                    <span style="color: var(--text-mid);">Implement a clear request lifecycle — from submission to approval to completion — with defined status stages.</span>
+                </li>
+                <li style="display:flex; gap:12px; align-items:flex-start;">
+                    <span style="color: var(--green); font-weight:700; min-width:20px;">5.</span>
+                    <span style="color: var(--text-mid);">Demonstrate core Django concepts: ORM, forms, templates, authentication, sessions, and admin.</span>
+                </li>
+                <li style="display:flex; gap:12px; align-items:flex-start;">
+                    <span style="color: var(--green); font-weight:700; min-width:20px;">6.</span>
+                    <span style="color: var(--text-mid);">Enforce security: ownership validation, permission checks, CSRF protection, and duplicate prevention.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-6">
+        <div class="card-header">How It Works</div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <p class="font-semi" style="margin-bottom: 4px;">Lending</p>
+                <p class="text-sm" style="color: var(--text-mid); line-height:1.7;">
+                    A student lists an item for <strong>Lending</strong>. Another student finds it on the Browse page, reads
+                    the details, and submits a borrowing request with a message and duration. The owner receives
+                    the request on their dashboard, and can approve or reject it. If approved, the item is marked
+                    as "Lent Out." After the item is returned, the owner marks the request as Completed and
+                    the item becomes available again.
+                </p>
+            </div>
+            <div>
+                <p class="font-semi" style="margin-bottom: 4px;">Exchange</p>
+                <p class="text-sm" style="color: var(--text-mid); line-height:1.7;">
+                    A student lists an item for <strong>Exchange</strong>. Another student proposes to swap their
+                    item in return — describing what they're offering. The owner reviews the proposal and
+                    accepts or rejects it. If accepted, both students arrange the physical exchange and the
+                    owner marks it as Completed.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Technology Stack</div>
+        <div class="card-body">
+            <table class="info-table">
+                <tr><td style="color:var(--text-muted);">Language</td><td>Python 3</td></tr>
+                <tr><td style="color:var(--text-muted);">Framework</td><td>Django 6.1</td></tr>
+                <tr><td style="color:var(--text-muted);">Database</td><td>SQLite (via Django ORM)</td></tr>
+                <tr><td style="color:var(--text-muted);">Frontend</td><td>HTML5, CSS3, Django Templates</td></tr>
+                <tr><td style="color:var(--text-muted);">Auth</td><td>Django built-in authentication &amp; sessions</td></tr>
+                <tr><td style="color:var(--text-muted);">Image handling</td><td>Pillow</td></tr>
+                <tr><td style="color:var(--text-muted);">Project type</td><td>CA2 — Problem Statement-Based Project</td></tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}

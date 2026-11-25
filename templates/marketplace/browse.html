@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load marketplace_tags %}
+{% block title %}Browse Items{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <div class="page-header">
+        <h1>Browse Items</h1>
+        <p>Find items available for borrowing or exchange from your fellow students.</p>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <form method="get" action="{% url 'marketplace:browse' %}">
+        <div class="filter-bar">
+
+            <div class="search-input-wrap">
+                <input
+                    type="text"
+                    name="q"
+                    class="form-control"
+                    placeholder="Search items..."
+                    value="{{ query }}"
+                >
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-category">Category</label>
+                <select name="category" id="filter-category" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-type">Type</label>
+                <select name="type" id="filter-type" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="lending"  {% if selected_type == 'lending'  %}selected{% endif %}>Lending</option>
+                    <option value="exchange" {% if selected_type == 'exchange' %}selected{% endif %}>Exchange</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-avail">Availability</label>
+                <select name="availability" id="filter-avail" class="form-control" onchange="this.form.submit()">
+                    <option value="available"   {% if selected_availability == 'available'   %}selected{% endif %}>Available</option>
+                    <option value=""            {% if selected_availability == ''            %}selected{% endif %}>All</option>
+                    <option value="requested"   {% if selected_availability == 'requested'   %}selected{% endif %}>Requested</option>
+                    <option value="lent_out"    {% if selected_availability == 'lent_out'    %}selected{% endif %}>Lent Out</option>
+                    <option value="unavailable" {% if selected_availability == 'unavailable' %}selected{% endif %}>Unavailable</option>
+                </select>
+            </div>
+
+            {% if query or selected_category or selected_type %}
+            <div class="filter-group" style="justify-content: flex-end;">
+                <label>&nbsp;</label>
+                <a href="{% url 'marketplace:browse' %}" class="btn btn-secondary btn-sm">Clear filters</a>
+            </div>
+            {% endif %}
+
+        </div>
+    </form>
+
+    <!-- Result count -->
+    <p class="text-sm text-muted mb-4">
+        {{ total_results }} item{{ total_results|pluralize }} found
+        {% if query %} for "<strong>{{ query }}</strong>"{% endif %}
+    </p>
+
+    <!-- Items Grid -->
+    {% if items %}
+    <div class="item-grid">
+        {% for item in items %}
+        <div class="item-card">
+            {% if item.image %}
+            <div class="item-card-image">
+                <img src="{{ item.image.url }}" alt="{{ item.name }}">
+            </div>
+            {% else %}
+            <div class="item-no-image">
+                <div class="item-no-image-icon">&#9711;</div>
+                <span>No photo</span>
+            </div>
+            {% endif %}
+
+            <div class="item-card-body">
+                <div class="item-card-name">
+                    <a href="{% url 'marketplace:item_detail' item.pk %}">{{ item.name }}</a>
+                </div>
+
+                <div class="item-card-meta">
+                    <span class="badge badge-{{ item.listing_type }}">{{ item.get_listing_type_display }}</span>
+                    <span class="badge {{ item.availability|badge_class }}">{{ item.get_availability_display }}</span>
+                    <span class="badge {{ item.condition|badge_class }}">{{ item.get_condition_display }}</span>
+                </div>
+
+                {% if item.category %}
+                <div class="text-sm text-muted">{{ item.category.name }}</div>
+                {% endif %}
+
+                <div class="item-card-owner">
+                    By {{ item.owner.first_name|default:item.owner.username }}
+                    &bull;
+                    <a href="{% url 'marketplace:item_detail' item.pk %}">View &rarr;</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state" style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+        <div class="empty-state-icon">&#9634;</div>
+        <h3>No items found</h3>
+        <p>Try adjusting your search or filters.</p>
+        <a href="{% url 'marketplace:browse' %}" class="btn btn-secondary">Clear filters</a>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

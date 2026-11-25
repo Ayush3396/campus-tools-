@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Exchange Proposals Sent{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+<div class="container">
+
+    <div class="page-header">
+        <h1>Exchange Proposals Sent</h1>
+        <p>Exchange proposals you have submitted. Cancel pending ones if the owner hasn't responded.</p>
+    </div>
+
+    <div class="d-flex gap-2 mb-6">
+        <a href="{% url 'marketplace:lending_requests_received' %}" class="btn btn-secondary btn-sm">Lending Received</a>
+        <a href="{% url 'marketplace:lending_requests_sent' %}" class="btn btn-secondary btn-sm">Lending Sent</a>
+        <a href="{% url 'marketplace:exchange_requests_received' %}" class="btn btn-secondary btn-sm">Exchange Received</a>
+        <a href="{% url 'marketplace:exchange_requests_sent' %}" class="btn btn-primary btn-sm">Exchange Sent</a>
+    </div>
+
+    {% if requests_list %}
+    {% for req in requests_list %}
+    <div class="card mb-4">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>
+                Your proposal for
+                <a href="{% url 'marketplace:item_detail' req.requested_item.pk %}">
+                    <strong>{{ req.requested_item.name }}</strong>
+                </a>
+                (owned by {{ req.owner.first_name|default:req.owner.username }})
+            </span>
+            <span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span>
+        </div>
+        <div class="card-body">
+            <div class="two-col">
+                <div>
+                    <p class="text-sm font-semi" style="color: var(--text-muted); margin-bottom: 6px;">YOU OFFERED</p>
+                    <p style="font-weight: 600; margin-bottom: 4px;">{{ req.offered_item_name }}</p>
+                    <p class="text-sm text-muted">{{ req.offered_item_description }}</p>
+                </div>
+                <div>
+                    {% if req.message %}
+                    <p class="text-sm font-semi" style="color: var(--text-muted); margin-bottom: 6px;">YOUR MESSAGE</p>
+                    <p class="text-sm text-muted">{{ req.message }}</p>
+                    {% endif %}
+                    <p class="text-sm text-muted mt-4">Sent on: {{ req.created_at|date:"d M Y" }}</p>
+                </div>
+            </div>
+
+            {% if req.status == 'accepted' %}
+            <div class="alert alert-success mt-4">
+                Your proposal was accepted! Arrange the exchange with {{ req.owner.first_name|default:req.owner.username }}.
+            </div>
+            {% elif req.status == 'pending' %}
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <form method="post" action="{% url 'marketplace:cancel_exchange_request' req.pk %}"
+                      onsubmit="return confirm('Cancel this exchange proposal?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Cancel Proposal</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty-state" style="background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+        <div class="empty-state-icon">&#9634;</div>
+        <h3>No proposals sent yet</h3>
+        <p>Find an item listed for exchange and send a proposal.</p>
+        <a href="{% url 'marketplace:browse' %}?type=exchange" class="btn btn-primary">Browse Exchange Items</a>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
